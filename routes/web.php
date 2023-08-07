@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\SectionsController;
 use App\Http\Controllers\frontend\IndexController;
 use App\Http\Controllers\frontend\ProductsController;
+use App\Http\Controllers\frontend\UserController;
 use App\Http\Controllers\frontend\VendorController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\Admin;
@@ -144,10 +145,22 @@ Route::get('/products/{vendorid}',[ProductsController::class,'vendorlisting']);
 Route::post('/get-product-price',[ProductsController::class,'getProductPrice']);
 
 // add to cart product
-Route::post('add-to-cart',[ProductsController::class,'addToCart'])->name('add.to.cart');
+Route::get('/cart',[ProductsController::class,'Cart'])->name('check.cart');
+Route::post('/add-to-cart',[ProductsController::class,'addToCart'])->name('add.to.cart');
+Route::post('/cart/update',[ProductsController::class,'updateCartItemQty'])->name('update.cart.item.qty');
+Route::post('/cart/delete',[ProductsController::class , 'cartDelete']);
 
+// vendor Login
 Route::get('vendor-login',[VendorController::class,'Vendor_login'])->name('vendor.login');
 // vendor register 
 Route::post('vendor-register',[VendorController::class,'Vendor_register'])->name('vendor.register');
 // confirm massage
 Route::get('vendor/confirm/{code}',[VendorController::class,'vendorConfirm']);
+// Users Controller 
+Route::get('user-login',[UserController::class,'user_register'])->name('user.login');
+Route::post('login/register',[UserController::class,'userRegister'])->name('user.register');
+Route::post('user/login-register',[UserController::class,'userLoginRegister'])->name('user.login.register');
+// user forgot password
+
+Route::match(['get','post'],'user/forgot/password',[UserController::class,'userForgotPassword'])->name('user.forgot.password');
+Route::get('user/logout',[UserController::class,'userLogout'])->name('user.logout');

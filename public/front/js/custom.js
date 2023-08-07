@@ -34,8 +34,8 @@
 
 // write filter code for get value 
 
-$(document).ready(function() {
-    $('#getPrice').change(function() {
+$(document).ready(function () {
+    $('#getPrice').change(function () {
         var size = $(this).val();
         var product_id = $(this).attr('product-id'); // Use 'data' instead of 'attr' for data attributes
         // alert(product_id);  
@@ -46,7 +46,7 @@ $(document).ready(function() {
             type: "post",
             url: "/get-product-price",
             data: { size: size, product_id: product_id },
-            success: function(res) {
+            success: function (res) {
                 if (res && res.discount > 0) {
                     $('.getDiscountAttributePrice').html(`
                     <div class='price-template'>
@@ -55,11 +55,11 @@ $(document).ready(function() {
                     </div>
                 `);
                 } else {
-                        $('.getDiscountAttributePrice').html(`<div class='price-template'><div class="item-new-price">${res.product_price}</div></div>`);
+                    $('.getDiscountAttributePrice').html(`<div class='price-template'><div class="item-new-price">${res.product_price}</div></div>`);
 
                 }
             },
-            error: function() {
+            error: function () {
                 alert('Error occurred while fetching the product price.');
             }
         });

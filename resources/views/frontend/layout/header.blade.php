@@ -13,12 +13,21 @@ $sections = Section::section();
                     <li>
                         <a href="tel:+111222333">
                             <i class="fas fa-phone u-c-brand u-s-m-r-9"></i>
-                            Telephone:+111-222-333</a>
+                            @if (isset(auth()->user()->name))
+                                {{auth()->user()->name}}
+                                @else
+                                tel:+111222333
+                            @endif
+                            </a>
                     </li>
                     <li>
                         <a href="mailto:info@sitemakers.in">
                             <i class="fas fa-envelope u-c-brand u-s-m-r-9"></i>
+                            @if (isset(auth()->user()->email))
+                            {{auth()->user()->email}}
+                            @else
                             E-mail: info@sitemakers.in
+                        @endif
                         </a>
                     </li>
                 </ul>
@@ -26,7 +35,7 @@ $sections = Section::section();
             <nav>
                 <ul class="secondary-nav g-nav">
                     <li>
-                        <a>My Account
+                        <a> @if (Auth::check())  My Account  @else Login/register   @endif 
                             <i class="fas fa-chevron-down u-s-m-l-9"></i>
                         </a>
                         <ul class="g-dropdown" style="width:200px">
@@ -45,8 +54,20 @@ $sections = Section::section();
                                     <i class="far fa-check-circle u-s-m-r-9"></i>
                                     Checkout</a>
                             </li>
+                            @if (Auth::check())
                             <li>
-                                <a href="account.html">
+                                <a href="{{url('user/account')}}">
+                                    <i class="fas fa-sign-in-alt u-s-m-r-9"></i>
+                                    My Account</a>
+                            </li>
+                            <li>
+                                <a href="{{route('user.logout')}}">
+                                    <i class="fas fa-sign-in-alt u-s-m-r-9"></i>
+                                    Logout</a>
+                            </li>
+                            @else
+                            <li>
+                                <a href="{{route('user.login')}}">
                                     <i class="fas fa-sign-in-alt u-s-m-r-9"></i>
                                     Customer Login</a>
                             </li>
@@ -55,6 +76,9 @@ $sections = Section::section();
                                     <i class="fas fa-sign-in-alt u-s-m-r-9"></i>
                                     Vendor Login</a>
                             </li>
+                            @endif
+                           
+                           
                         </ul>
                     </li>
                     <li>
@@ -93,7 +117,7 @@ $sections = Section::section();
             <div class="row clearfix align-items-center">
                 <div class="col-lg-3 col-md-9 col-sm-6">
                     <div class="brand-logo text-lg-center">
-                        <a href="index.html">
+                        <a href="{{url('/')}}">
                             {{-- <img src="{{ url('front/images/main-logo/stack-developers-logo.png') }}"
                                 alt="Stack Developers" class="app-brand-logo"> --}}
                                <h3> Multi-Vendor </h3>
@@ -206,8 +230,8 @@ $sections = Section::section();
                 <span class="mini-total-price float-right">$400.00</span>
             </div>
             <div class="mini-action-anchors">
-                <a href="cart.html" class="cart-anchor">View Cart</a>
-                <a href="checkout.html" class="checkout-anchor">Checkout</a>
+                <a href="{{route('check.cart')}}" class="cart-anchor">View Cart</a>
+                <a href="#" class="checkout-anchor">Checkout</a>
             </div>
         </div>
     </div>

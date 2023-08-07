@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+use Illuminate\Support\Facades\View;
 
 use function Pest\Laravel\get;
 
@@ -196,33 +198,90 @@ class ProductsController extends Controller
             return $getDiscountAttributePrice;
         }
     }
+
     public function addToCart(Request $request)
     {
         if ($request->isMethod('post')) {
             $data = $request->all();
-            // if (Auth::check()) {
-            //     $isStockavailible = Products_Attribute::isStockavailible($data['product_id'], $data['size']);
-            // }else{
-            //     return  redirect()->route('vendor.login')->with('message', 'Please log in to add items to your cart.');
-            // }      
-            $isStockavailible = Products_Attribute::isStockavailible($data['product_id'], $data['size']);     
-            // dd($isStockavailible);die;
+            $isStockavailible = Products_Attribute::isStockavailible($data['product_id'], $data['size']);
             if ($isStockavailible < $data['quantity']) {
-                return redirect()->back()->with('massage', 'the product quantity not Availible');
+                return redirect()->back()->with('error', 'the product quantity not Availible');
             }
             $session_id = Session::get('session_id');
             if (!empty($session_id)) {
                 $session_id = Session::getId();
-               Session::put('session_id',$session_id);
+                Session::put('session_id', $session_id);
             }
-            $item = new Cart ;
-            $item->session_id =    $session_id ;
+            if (Auth::check()) {
+                // user logged in
+                $user_id = Auth::user()->id;
+                $countProducts = Cart::where(['product_id' => $data['product_id'], 'size' => $data['size'], 'user_id' => $user_id])->count();
+            } else {
+                // user not logged in 
+                $user_id = 0;
+                $countProducts = Cart::where(['product_id' => $data['product_id'], 'size' => $data['size'], 'session_id' => $session_id])->count();
+            }
+            $item = new Cart;
+            $item->session_id =    $session_id;
+            $item->user_id =    $user_id;
             $item->product_id =    $data['product_id'];
-            $item->size =    $data['size'] ;
+            $item->size =    $data['size'];
             $item->quantity =    $data['quantity'];
-            $item->save() ; 
+            $item->save();
+            return redirect()->back()->with('massage', 'the product add to cart successFully! <a href="/cart">View Cart</a>');
+        }
+    }
+    public function Cart()
+    {
+        $getCartItems = Cart::getCartItems();
+        // dd($getCartItems);die;
+        return view('frontend.cart.cart')->with(compact('getCartItems'));
+    }
+    public function updateCartItemQty(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = $request->all();
+            $cartDetails = Cart::find($data['id']);
+            // match the cart id with the product_attribute table
+            $availibleStok  = Products_Attribute::select('stock')->where(['product_id'=>$cartDetails['product_id'],'size'=>$cartDetails['size']])->first()->toArray();
+            // check if desired Stack from is user availible 
+            if ($data['qty'] >$availibleStok['stock']) {
+                $getCartItems = Cart::getCartItems();
+                return response()->json(
+                    [
+                        'status' => false, 
+                        'massage' => 'Product Stock is not Availible',
+                        'view' => (string)View::make('frontend.cart.cart-items')->with(compact('getCartItems'))]);
+            }
+            // match the size if availible 
+            $availibleSize = Products_Attribute::where(['product_id'=>$cartDetails['product_id'],'size'=>$cartDetails['size'],'status'=>1])->first()->toArray();
+            if ($availibleSize ==0) {
+                $getCartItems = Cart::getCartItems();
+                return response()->json(
+                    [
+                        'status' => false, 
+                        'massage' => 'Product Size is not Availible',
+                        'view' => (string)View::make('frontend.cart.cart-items')->with(compact('getCartItems'))
+                    ]);
+                
+            }
+            // this is for quantity update
+            Cart::where('id', $data['id'])->update(['quantity' => $data['qty']]);
+            $getCartItems = Cart::getCartItems();
+            return response()->json(['status' => true, 'view' => (string)View::make('frontend.cart.cart-items')->with(compact('getCartItems'))]);
+        }
+    }
+    public function cartDelete(Request $request){
+        if ($request->ajax()) {
+            $data = $request->all();
 
-            return redirect()->back()->with('massage','the product add to cart successFully');
+            Cart::where('id',$data['cartid'])->delete();
+            $getCartItems = Cart::getCartItems();
+            return response()->json(
+                [
+                    'view' => (string)View::make('frontend.cart.cart-items')->with(compact('getCartItems'))
+                ]);
+
         }
     }
 }

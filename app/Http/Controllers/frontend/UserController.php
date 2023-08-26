@@ -4,6 +4,7 @@ namespace App\Http\Controllers\frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cart;
+use App\Models\Country;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -44,20 +45,20 @@ class UserController extends Controller
 
         // send Register Email massage 
         $email = $data['email'];
-        $massageData = ['name'=>$data['name'],'mobile'=>$data['mobile'],'email'=>$data['email']];
-        Mail::send('emails.register', $massageData, function ($message)use ($email) {
+        $massageData = ['name' => $data['name'], 'mobile' => $data['mobile'], 'email' => $data['email']];
+        Mail::send('emails.register', $massageData, function ($message) use ($email) {
             $message->to($email)->subject('well to the Multi-Vendor E-commerce website ');
         });
 
 
         if (Auth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
             return redirect('/cart')->with('massage');
-        }else{
+        } else {
             return redirect()->back()->with('error');
-
         }
     }
-    public function userLoginRegister(Request $request){
+    public function userLoginRegister(Request $request)
+    {
         if ($request->isMethod('post')) {
             $validated = $request->validate([
                 'email' => 'required|email|exists:users',
@@ -71,12 +72,21 @@ class UserController extends Controller
                 if (!empty(Session::get('session_id'))) {
                     $user_id = Auth::user()->id;
                     $session_id = Session::get('session_id');
-                    Cart::where('session_id',$session_id)->update(['user_id'=>$user_id]);
+                    Cart::where('session_id', $session_id)->update(['user_id' => $user_id]);
                 }
                 return redirect('/cart')->with('massage');
-            }else{
+            } else {
                 return redirect()->back()->with('error');
             }
+        }
+    }
+    public function userAcount(Request $request)
+    {
+        if ($request->ajax()) {
+
+        }else{
+            $countries  = Country::where('status',1)->get()->toarray();
+            return view('frontend.userlogin.useraccount')->with(compact('countries'));
         }
     }
     public function userLogout()
@@ -86,6 +96,5 @@ class UserController extends Controller
     }
     public function userForgotPassword(Request $request)
     {
-        
     }
 }

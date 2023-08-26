@@ -49,11 +49,11 @@ $sections = Section::section();
                                     <i class="far fa-heart u-s-m-r-9"></i>
                                     My Wishlist</a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a href="checkout.html">
                                     <i class="far fa-check-circle u-s-m-r-9"></i>
                                     Checkout</a>
-                            </li>
+                            </li> --}}
                             @if (Auth::check())
                             <li>
                                 <a href="{{url('user/account')}}">

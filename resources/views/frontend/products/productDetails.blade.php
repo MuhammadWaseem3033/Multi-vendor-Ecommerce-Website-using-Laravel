@@ -41,13 +41,6 @@ $productsFilters = ProductsFilter::productgetvalue();
                 <div class="col-lg-6 col-md-6 col-sm-12">
                     <!-- Product-details -->
                     <div class="all-information-wrapper">
-                        {{-- @if (session()->has('massage'))
-                            <div class="col-12 alert alert-danger alert-dismissible fade show" role="alert">
-                                {{ session()->get('massage') }}
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"
-                                    aria-label="Close"></button>
-                            </div>
-                        @endif --}}
                         @if (session()->has('massage'))
                             <div class="alert alert-success alert-block">
                                 <button type="button" class="close" data-dismiss="alert">×</button>

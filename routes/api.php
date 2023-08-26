@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\FrontendApicontroller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+Route::prefix('Api')->as('Api')->group(function(){
+    Route::get('test',[FrontendApicontroller::class,'index']);
+    Route::post('test-store',[FrontendApicontroller::class,'store']);
+    Route::get('test-show/{name?}/{id?}',[FrontendApicontroller::class,'show']);
 });

@@ -160,6 +160,7 @@ Route::get('vendor/confirm/{code}',[VendorController::class,'vendorConfirm']);
 Route::get('user-login',[UserController::class,'user_register'])->name('user.login');
 Route::post('login/register',[UserController::class,'userRegister'])->name('user.register');
 Route::post('user/login-register',[UserController::class,'userLoginRegister'])->name('user.login.register');
+Route::match(['get','post'],'user/account',[UserController::class,'userAcount']);
 // user forgot password
 
 Route::match(['get','post'],'user/forgot/password',[UserController::class,'userForgotPassword'])->name('user.forgot.password');
